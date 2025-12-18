@@ -7,15 +7,15 @@ from pathlib import Path
 BASE_DIR = Path(__file__).parent
 PROJECT_ROOT = BASE_DIR.parent
 
-# Model paths (trained models from research)
-MODELS_DIR = PROJECT_ROOT / "submission_workspace" / "models"
-GAHT_MODEL_PATH = MODELS_DIR / "gaht_fold_0.pth"
-RF_MODEL_PATH = MODELS_DIR / "rf_fold_0.pkl"
-MLP_MODEL_PATH = MODELS_DIR / "mlp_fold_0.pkl"
+# Model paths (using demo mode - no models needed)
+MODELS_DIR = BASE_DIR / "models"
+GAHT_MODEL_PATH = None  # Disabled for free tier
+RF_MODEL_PATH = None    # Using demo mode
+MLP_MODEL_PATH = None   # Using demo mode
 
-# Data paths
-DATA_DIR = PROJECT_ROOT / "data"
-DATASET_PATH = DATA_DIR / "combined_tox21_hepatotoxicity.csv"
+# Data paths (demo dataset included)
+DATA_DIR = BASE_DIR / "data"
+DATASET_PATH = DATA_DIR / "demo_molecules.csv"
 
 # Results paths
 RESULTS_DIR = PROJECT_ROOT / "submission_workspace" / "results"
