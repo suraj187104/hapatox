@@ -1,6 +1,6 @@
 # Gunicorn configuration for Render deployment
-bind = "0.0.0.0:5000"
-workers = 2
+bind = "0.0.0.0:10000"
+workers = 1
 worker_class = "sync"
 timeout = 120
 keepalive = 5
