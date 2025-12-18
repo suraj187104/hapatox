@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Performance Dashboard - HepatoTox{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <span class="section-label">Trust playbook</span>
+        <h2 class="page-heading">How we keep HepatoTox honest without drowning you in numbers.</h2>
+        <p class="friendly-text mx-auto">Share this page when someone asks "why should I trust this?"—it lists the routines, safety checks, and human-friendly ways to interpret each model.</p>
+    </div>
+
+    <!-- Trust Checklist -->
+    <div class="card shadow-sm mb-5 info-card">
+        <div class="card-body">
+            <h5 class="card-title mb-3">
+                <i class="fas fa-clipboard-check me-2"></i>
+                Routine we run before every release
+            </h5>
+            <ul class="mb-0">
+                <li>Blend historical toxic/non-toxic examples so both sides get equal airtime during validation.</li>
+                <li>Shuffle molecules into five scaffold-based folds to mimic real “new chemistry” scenarios.</li>
+                <li>Replay predictions with shuffled labels to ensure the stack is not memorizing.</li>
+                <li>Spot-check explainability heatmaps with chemists before enabling public access.</li>
+                <li>Log every batch job (anonymized) to keep an eye on drift and weird edge cases.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Model Personalities -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 border-primary">
+                <div class="card-body">
+                    <h5 class="text-primary"><i class="fas fa-brain me-2"></i>GAHT</h5>
+                    <p class="friendly-text">Acts like a careful lab partner who would rather over-communicate than miss a red flag.</p>
+                    <ul class="small mb-0">
+                        <li>Looks at 3D structure, so bulky groups stand out.</li>
+                        <li>Best for "I need the earliest warning" moments.</li>
+                        <li>Pair with explainability to justify the caution.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-success">
+                <div class="card-body">
+                    <h5 class="text-success"><i class="fas fa-tree me-2"></i>Random Forest</h5>
+                    <p class="friendly-text">Grounded in classic cheminformatics fingerprints—great when you want something traditional.</p>
+                    <ul class="small mb-0">
+                        <li>Comfortable with legacy pipelines and QSAR checks.</li>
+                        <li>Feel free to cite it in SOPs or risk memos.</li>
+                        <li>Balances sensitivity and calm decision-making.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-info">
+                <div class="card-body">
+                    <h5 class="text-info"><i class="fas fa-project-diagram me-2"></i>MLP</h5>
+                    <p class="friendly-text">Fast checker trained on light-weight descriptors—perfect for triage lists and hackathons.</p>
+                    <ul class="small mb-0">
+                        <li>Use it when you care about throughput.</li>
+                        <li>Compare its verdict against GAHT to highlight consensus.</li>
+                        <li>Great sanity check before sharing with leadership.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quality Practices -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <h5 class="card-title mb-4">
+                <i class="fas fa-shield-heart me-2"></i>
+                Quality practices in plain English
+            </h5>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h6 class="text-success">What happens after you click predict</h6>
+                    <ol class="small mb-0">
+                        <li>The SMILES is validated and sanitized (no hidden salts).</li>
+                        <li>All three models vote independently so one loud voice cannot dominate.</li>
+                        <li>Consensus logic summarizes the tone (“gentle warning” vs “all clear”).</li>
+                        <li>We attach a plain-language note plus a confidence badge.</li>
+                        <li>Explainability is queued so you can show your team the same view.</li>
+                    </ol>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-warning">When to pause before acting</h6>
+                    <ul class="small mb-0">
+                        <li>If the molecule contains metals or exotic atoms we do not support yet.</li>
+                        <li>When GAHT screams but Random Forest stays calm—double-check with a chemist.</li>
+                        <li>After major R&D shifts (new assay, reformulated library) run a mini benchmark first.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Communication Tips -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="fas fa-bullhorn me-2"></i>How to talk about HepatoTox</h5>
+                    <ul class="mb-0 small">
+                        <li>Lead with the story: “Three models reviewed this molecule and all agreed it looks safe.”</li>
+                        <li>Mention the data diet: “Trained on thousands of liver-specific assays, refreshed quarterly.”</li>
+                        <li>Invite others to reproduce: “You can upload the same CSV and you will get the identical file back.”</li>
+                        <li>Show the explainability heatmap instead of quoting numbers—visuals spark better questions.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="fas fa-life-ring me-2"></i>What to do if something feels off</h5>
+                    <ol class="mb-0 small">
+                        <li>Run the molecule again and download the CSV for your notes.</li>
+                        <li>Use the Dataset page to find a similar structure and compare outputs.</li>
+                        <li>Flag the SMILES in your issue tracker so we can add it to the drift watch list.</li>
+                        <li>Share screenshots of the explainability view—those help us diagnose faster than logs.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assurance -->
+    <div class="card shadow-sm border-success">
+        <div class="card-body">
+            <h5 class="card-title text-success mb-3"><i class="fas fa-handshake me-2"></i>Our promise</h5>
+            <p class="mb-2">We will never publish raw accuracy numbers on this page—just the habits that keep the system trustworthy.</p>
+            <p class="mb-0 small text-muted">Need a deeper audit? Reach out via the contact link in the footer and we will share the full validation notebook privately.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Explainability - HepatoTox{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="text-center mb-5">
+                <span class="section-label">Explain it simply</span>
+                <h2 class="page-heading">See which atoms made GAHT raise an eyebrow.</h2>
+                <p class="friendly-text mx-auto">We hide the math and show you bright, easy-to-read highlights so you can explain toxicity to anyone in the room.</p>
+            </div>
+
+            <!-- Input Section -->
+            <div class="card shadow-sm mb-4 info-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">1. Paste a SMILES to color-code</h5>
+                    <div class="mb-3">
+                        <label for="smilesInput" class="form-label">SMILES String:</label>
+                        <input type="text" class="form-control form-control-lg" id="smilesInput" 
+                               placeholder="e.g., Cc1cc(ccc1N)c2ccc(N)c(C)c2" value="">
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-success btn-lg" id="explainBtn">
+                            <i class="fas fa-magic me-2"></i>
+                            Generate Explanation
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example Molecules -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="card-title mb-3">Try Example Molecules:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-sm btn-outline-secondary example-btn" data-smiles="Cc1cc(ccc1N)c2ccc(N)c(C)c2">
+                            Toxic Example 1
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary example-btn" data-smiles="O=[N+]([O-])c1ccc(O)cc1">
+                            Toxic Example 2
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary example-btn" data-smiles="CC(C)Cc1ccc(cc1)C(C)C(O)=O">
+                            Non-toxic Example
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Friendly instructions -->
+            <div class="card shadow-sm mb-4 info-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">How to tell the story</h5>
+                    <ul class="mb-0">
+                        <li>Green atoms = calming influence, red atoms = spots that made GAHT nervous.</li>
+                        <li>Use the atom table as speaker notes when you present the heatmap.</li>
+                        <li>Mention that we test every highlight against counterfactuals (remove atom → see change) so viewers understand it is not random.</li>
+                        <li>Need to share quickly? Screenshot the molecule box—no login required.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div id="loadingSpinner" class="text-center my-5" style="display: none;">
+                <div class="spinner-border text-success" style="width: 3rem; height: 3rem;"></div>
+                <p class="mt-3">Analyzing molecular features...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" style="display: none;">
+                <!-- Prediction Summary -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Prediction Summary</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div id="moleculeStructure" class="text-center mb-3"></div>
+                                <p class="text-center text-muted small" id="moleculeSMILES"></p>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-center">
+                                <div class="w-100">
+                                    <div class="alert border-0 shadow-sm" id="predictionAlert">
+                                        <h4 class="mb-2" id="predictionLabel"></h4>
+                                        <div class="progress mb-2" style="height: 25px;">
+                                            <div class="progress-bar" id="predictionBar"></div>
+                                        </div>
+                                        <p class="mb-0 small" id="predictionProb"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Atom Importance -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fas fa-atom me-2"></i>
+                            Atom-Level Importance
+                        </h5>
+                        <p class="text-muted">
+                            These atoms contribute most to the toxicity prediction. Higher importance means 
+                            the atom has a stronger influence on the model's decision.
+                        </p>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-success">
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Atom Index</th>
+                                        <th>Element</th>
+                                        <th>Importance Score</th>
+                                        <th>Visualization</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="atomTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explanation -->
+                <div class="card shadow-sm mb-4 border-info">
+                    <div class="card-body">
+                        <h5 class="card-title text-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Reading the colors
+                        </h5>
+                        <ul class="mb-0">
+                            <li><strong>Big numbers</strong> mean the atom changed the prediction a lot (watch closely).</li>
+                            <li><strong>Tiny numbers</strong> mean the atom barely mattered (safe to ignore).</li>
+                            <li>We temporarily hide each atom to see how nervous GAHT becomes. More nerves = higher score.</li>
+                            <li>Export or screenshot the table if you need to explain it in a slide deck.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="text-center">
+                    <button class="btn btn-outline-success" id="newAnalysisBtn">
+                        <i class="fas fa-redo me-2"></i>
+                        Analyze Another Molecule
+                    </button>
+                    <a href="{{ url_for('predict_page') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Back to Prediction
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    let currentSMILES = '';
+
+    // Explain button click
+    $('#explainBtn').click(function() {
+        const smiles = $('#smilesInput').val().trim();
+        if (!smiles) {
+            alert('Please enter a SMILES string');
+            return;
+        }
+        explainMolecule(smiles);
+    });
+
+    // Example button clicks
+    $('.example-btn').click(function() {
+        const smiles = $(this).data('smiles');
+        $('#smilesInput').val(smiles);
+        explainMolecule(smiles);
+    });
+
+    // New analysis button
+    $('#newAnalysisBtn').click(function() {
+        $('#resultsSection').hide();
+        $('#smilesInput').val('').focus();
+    });
+
+    function explainMolecule(smiles) {
+        currentSMILES = smiles;
+        
+        // Show loading
+        $('#loadingSpinner').show();
+        $('#resultsSection').hide();
+
+        // Make API call
+        $.ajax({
+            url: '/api/explain',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ smiles: smiles }),
+            success: function(data) {
+                displayExplanation(data);
+            },
+            error: function(xhr) {
+                const error = xhr.responseJSON?.error || 'Explanation failed';
+                alert('Error: ' + error);
+                $('#loadingSpinner').hide();
+            }
+        });
+    }
+
+    function displayExplanation(data) {
+        $('#loadingSpinner').hide();
+        
+        // Display SMILES
+        $('#moleculeSMILES').text(currentSMILES);
+
+        // Prediction summary
+        const isToxic = data.label === 'Toxic';
+        const alertClass = isToxic ? 'alert-danger' : 'alert-success';
+        const barClass = isToxic ? 'bg-danger' : 'bg-success';
+        
+        $('#predictionAlert').removeClass('alert-danger alert-success').addClass(alertClass);
+        $('#predictionLabel').html(`<i class="fas fa-${isToxic ? 'exclamation-triangle' : 'check-circle'} me-2"></i>${data.label}`);
+        $('#predictionBar').removeClass('bg-danger bg-success').addClass(barClass).css('width', (data.prediction * 100) + '%');
+        $('#predictionProb').text(`Probability: ${(data.prediction * 100).toFixed(1)}%`);
+
+        // Top atoms table
+        const tableBody = $('#atomTableBody');
+        tableBody.empty();
+        
+        data.top_atoms.forEach((atom, index) => {
+            const importancePercent = (atom.importance * 100).toFixed(2);
+            const barWidth = Math.min(100, atom.importance * 1000); // Scale for visibility
+            
+            const row = `
+                <tr>
+                    <td><span class="badge bg-secondary">${index + 1}</span></td>
+                    <td>${atom.index}</td>
+                    <td><span class="badge bg-primary">${atom.symbol}</span></td>
+                    <td><strong>${atom.importance.toFixed(4)}</strong></td>
+                    <td>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-warning" style="width: ${barWidth}%">
+                                ${importancePercent}%
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            tableBody.append(row);
+        });
+
+        $('#resultsSection').show();
+    }
+});
+</script>
+{% endblock %}

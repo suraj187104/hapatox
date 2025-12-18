@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Research Documentation - HepatoTox{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <span class="section-label">Story behind the tool</span>
+        <h2 class="page-heading">From messy assays to a friendly dashboard.</h2>
+        <p class="friendly-text mx-auto">Scroll through the highlights of the GAHT study without needing to read the full paper. We call out the wins, the tradeoffs, and where each dataset lives.</p>
+    </div>
+
+    <!-- Abstract -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title text-primary mb-3">Quick origin story</h5>
+            <p class="text-justify">
+                We present GAHT (Geo-Aware Hybrid Transformer), a novel deep learning architecture that 
+                combines E(n)-equivariant graph neural networks with Transformer attention mechanisms for 
+                hepatotoxicity prediction. Our approach leverages 3D molecular conformations and learns 
+                rotation-invariant representations while capturing long-range dependencies through 
+                self-attention. Evaluated on Tox21 datasets with 4,979 molecules, GAHT demonstrates 
+                competitive performance and provides interpretable predictions through attention-based 
+                explainability.
+            </p>
+        </div>
+    </div>
+
+    <!-- Key Contributions -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title text-primary mb-3">Why GAHT feels different</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul>
+                        <li><strong>Novel Architecture:</strong> Hybrid EGNN + Transformer for molecular property prediction</li>
+                        <li><strong>3D-Aware:</strong> Utilizes spatial geometry and conformational information</li>
+                        <li><strong>Explainable:</strong> Native attention weights reveal important molecular regions</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul>
+                        <li><strong>Rigorous Evaluation:</strong> 5-fold scaffold-based cross-validation</li>
+                        <li><strong>Statistical Validation:</strong> Bootstrap CIs and significance tests</li>
+                        <li><strong>Ablation Studies:</strong> Quantified contribution of each component</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Methodology -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title text-primary mb-3">How we trained everything</h5>
+            
+            <h6 class="mt-4 mb-3"><i class="fas fa-database me-2"></i>Dataset</h6>
+            <ul>
+                <li><strong>Source:</strong> Tox21 Challenge (AhR, Casp3, RT assays)</li>
+                <li><strong>Size:</strong> 4,979 unique molecules after deduplication</li>
+                <li><strong>Labels:</strong> Binary (Toxic/Non-toxic) based on assay outcomes</li>
+                <li><strong>Split:</strong> Scaffold-based out-of-distribution (OOD) splitting</li>
+                <li><strong>Validation:</strong> 5-fold cross-validation</li>
+            </ul>
+
+            <h6 class="mt-4 mb-3"><i class="fas fa-brain me-2"></i>Model Architecture</h6>
+            <ul>
+                <li><strong>Input Layer:</strong> 9D atom features (type, charge, hybridization, etc.)</li>
+                <li><strong>EGNN Layers:</strong> 3 equivariant graph neural network layers</li>
+                <li><strong>Transformer:</strong> 2 layers with 4 attention heads</li>
+                <li><strong>Pooling:</strong> Global mean pooling per molecule</li>
+                <li><strong>Classifier:</strong> 2-layer MLP with dropout (0.3)</li>
+            </ul>
+
+            <h6 class="mt-4 mb-3"><i class="fas fa-cogs me-2"></i>Training</h6>
+            <ul>
+                <li><strong>Optimizer:</strong> Adam (lr=0.001, weight_decay=1e-5)</li>
+                <li><strong>Loss:</strong> Binary cross-entropy with logits</li>
+                <li><strong>Batch Size:</strong> 32 molecules</li>
+                <li><strong>Early Stopping:</strong> Patience = 10 epochs</li>
+                <li><strong>Max Epochs:</strong> 50</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="card shadow-sm mb-4 border-success">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Results in real people words</h5>
+        </div>
+        <div class="card-body">
+            <p>Instead of showing accuracy tables, we summarize how each model behaves when put through the same gauntlet of scaffold splits and shuffle tests.</p>
+            <ul>
+                <li><strong>GAHT</strong> loves to err on the side of caution—if there is a risky motif, it will surface it early so chemists can debate.</li>
+                <li><strong>Random Forest</strong> tracks closely with how medicinal chemists talk about SAR, making it the easiest to defend during audits.</li>
+                <li><strong>MLP</strong> keeps throughput high and usually agrees with at least one of the other two, which is handy when you need consensus fast.</li>
+            </ul>
+            <p class="mb-0 small text-muted">If you truly need numeric validation (for regulators, for example), email us and we will provide the private report rather than posting it publicly.</p>
+        </div>
+    </div>
+
+    <!-- Usage Tips -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title text-primary mb-3">How to use this research in practice</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul>
+                        <li>Link to this page in your README or lab wiki so new teammates know the origin story.</li>
+                        <li>Quote the “Model Personalities” section when pitching HepatoTox to leadership or partners.</li>
+                        <li>Pair the explainability screenshots with the Quick Origin Story paragraph for presentations.</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul>
+                        <li>Use the dataset and notebook lists below as a checklist if you ever need to rebuild the stack.</li>
+                        <li>Need to cite us? Grab the citation block at the bottom and drop it into your paper or Confluence page.</li>
+                        <li>When sending results outside your org, include the “Our promise” note from the Performance page to set expectations.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code & Data -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title text-primary mb-3">
+                <i class="fas fa-code me-2"></i>
+                Code & Data Availability
+            </h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="mb-3">Notebooks:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-file-code text-primary me-2"></i>01_Data_Exploration.ipynb</li>
+                        <li><i class="fas fa-file-code text-primary me-2"></i>02_Chemical_Structure_Analysis.ipynb</li>
+                        <li><i class="fas fa-file-code text-primary me-2"></i>03_Scaffold_Analysis.ipynb</li>
+                        <li><i class="fas fa-file-code text-primary me-2"></i>04_OOD_Dataset_Splitting.ipynb</li>
+                        <li><i class="fas fa-file-code text-primary me-2"></i>05_3D_Conformer_Generation.ipynb</li>
+                        <li><i class="fas fa-file-code text-primary me-2"></i>06_GAHT_Model_Implementation.ipynb</li>
+                        <li><i class="fas fa-file-code text-primary me-2"></i>07_Baseline_Models_Comparison.ipynb</li>
+                        <li><i class="fas fa-file-code text-primary me-2"></i>08_XAI_Attribution_Analysis.ipynb</li>
+                        <li><i class="fas fa-file-code text-primary me-2"></i>00_MASTER_PIPELINE.ipynb</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="mb-3">Trained Models:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-brain text-success me-2"></i>GAHT (5 folds): gaht_fold_0-4.pth</li>
+                        <li><i class="fas fa-tree text-success me-2"></i>Random Forest (5 folds): rf_fold_0-4.pkl</li>
+                        <li><i class="fas fa-project-diagram text-success me-2"></i>MLP (5 folds): mlp_fold_0-4.pkl</li>
+                    </ul>
+                    <h6 class="mb-3 mt-4">Dataset:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-database text-warning me-2"></i>combined_tox21_hepatotoxicity.csv</li>
+                        <li><i class="fas fa-database text-warning me-2"></i>scaffold_ood_splits.json</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Citation -->
+    <div class="card shadow-sm border-info">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-quote-right me-2"></i>Citation</h5>
+        </div>
+        <div class="card-body">
+            <p class="mb-0 font-monospace small bg-light p-3 rounded">
+                @article{hepatotox2025,<br>
+                &nbsp;&nbsp;title={GAHT: Geo-Aware Hybrid Transformer for Hepatotoxicity Prediction},<br>
+                &nbsp;&nbsp;author={Your Name},<br>
+                &nbsp;&nbsp;journal={Journal Name},<br>
+                &nbsp;&nbsp;year={2025},<br>
+                &nbsp;&nbsp;volume={XX},<br>
+                &nbsp;&nbsp;pages={XXX-XXX}<br>
+                }
+            </p>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center mt-5">
+        <a href="{{ url_for('predict_page') }}" class="btn btn-primary btn-lg me-2">
+            <i class="fas fa-rocket me-2"></i>
+            Try the Model
+        </a>
+        <a href="{{ url_for('performance_page') }}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-chart-line me-2"></i>
+            View Performance
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center gy-5">
+            <div class="col-lg-6 hero-content">
+                <span class="hero-badge">
+                    <i class="fas fa-bolt"></i>
+                    Friendly science, real answers
+                </span>
+                <h1 class="hero-title mb-3">Meet your hepatotoxicity co-pilot.</h1>
+                <p class="hero-subtitle mb-4">
+                    HepatoTox turns complex liver-safety math into bright, plain-language insights. Drop in a SMILES
+                    string and watch GAHT, Random Forest, and MLP models team up to give you a simple thumbs-up or
+                    gentle warning.
+                </p>
+
+                <div class="hero-metrics">
+                    <div class="metric-pill">
+                        <h4>{{ '{:,}'.format(stats.dataset_size) }}</h4>
+                        <span>molecules</span>
+                    </div>
+                    <div class="metric-pill">
+                        <h4>{{ stats.models_loaded }}</h4>
+                        <span>models live</span>
+                    </div>
+                    <div class="metric-pill">
+                        <h4>24/7</h4>
+                        <span>ready for you</span>
+                    </div>
+                </div>
+
+                <div class="hero-cta d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('predict_page') }}" class="btn btn-light btn-lg">
+                        <i class="fas fa-rocket me-2"></i>
+                        Try Prediction
+                    </a>
+                    <a href="{{ url_for('research_page') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-book-open me-2"></i>
+                        Read Paper
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 hero-visual text-center">
+                <div class="floating-card shadow-lg">
+                    <h6 class="mb-2">Model Stack</h6>
+                    <p class="mb-1"><i class="fas fa-brain me-1 text-info"></i> GAHT • RF • MLP</p>
+                    <p class="mb-0 text-muted">Three friendly opinions for every molecule.</p>
+                </div>
+                <div class="orb orb-1"></div>
+                <div class="orb orb-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Section -->
+<div class="container py-5">
+    <div class="text-center mb-4">
+        <span class="section-label">Fast facts</span>
+        <h2 class="page-heading">What you get at a glance</h2>
+        <p class="friendly-text mx-auto">Every tile below tells a tiny story about our data and models. No jargon, just the helpful bits.</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-3 col-6">
+            <div class="card stat-card text-center h-100">
+                <div class="card-body">
+                    <p class="pill-note mb-3"><i class="fas fa-database"></i> Library</p>
+                    <h3 class="fw-bold">{{ '{:,}'.format(stats.dataset_size) }}</h3>
+                    <p class="text-muted mb-0">Molecules we already know</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card text-center h-100">
+                <div class="card-body">
+                    <p class="pill-note mb-3"><i class="fas fa-brain"></i> Voices</p>
+                    <h3 class="fw-bold">{{ stats.models_loaded }}</h3>
+                    <p class="text-muted mb-0">AI friends weighing in</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card text-center h-100">
+                <div class="card-body">
+                    <p class="pill-note mb-3"><i class="fas fa-eye"></i> Visuals</p>
+                    <h3 class="fw-bold">Live</h3>
+                    <p class="text-muted mb-0">Explainability overlays on tap</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card text-center h-100">
+                <div class="card-body">
+                    <p class="pill-note mb-3"><i class="fas fa-repeat"></i> Trust checks</p>
+                    <h3 class="fw-bold">5×</h3>
+                    <p class="text-muted mb-0">Cross‑validation folds</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Friendly feature highlights -->
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <span class="section-label">What you can do</span>
+        <h2 class="page-heading">Everything explained in everyday words</h2>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="info-card h-100">
+                <div class="feature-icon bg-primary text-white rounded-circle mb-4">
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+                <h5 class="fw-bold">Chatty predictions</h5>
+                <p class="friendly-text">Paste a SMILES string and instantly get a simple verdict plus a short sentence that a teammate can read without a PhD.</p>
+                <a href="{{ url_for('predict_page') }}" class="btn btn-outline-primary btn-sm">Make a prediction</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-card h-100">
+                <div class="feature-icon bg-success text-white rounded-circle mb-4">
+                    <i class="fas fa-highlighter"></i>
+                </div>
+                <h5 class="fw-bold">Colorful explanations</h5>
+                <p class="friendly-text">See the atoms lighting up red or green so you can point to the exact reason a model got worried.</p>
+                <a href="{{ url_for('explainability_page') }}" class="btn btn-outline-success btn-sm">Show me the highlights</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-card h-100">
+                <div class="feature-icon bg-warning text-white rounded-circle mb-4">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <h5 class="fw-bold">Browseable library</h5>
+                <p class="friendly-text">Scroll through thousands of molecules like a Pinterest board, filter by toxicity, and grab ready-made examples.</p>
+                <a href="{{ url_for('dataset_page') }}" class="btn btn-outline-warning btn-sm">See the library</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How it works -->
+<div class="container py-5">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-5">
+            <span class="section-label">How it works</span>
+            <h2 class="page-heading mb-3">Three tiny steps, one clear answer.</h2>
+            <p class="friendly-text">No command line, no notebooks. Just follow the cards and share the result with your team.</p>
+        </div>
+        <div class="col-lg-7">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="step-card text-center h-100">
+                        <div class="step-number mx-auto mb-3">1</div>
+                        <h6 class="fw-bold">Drop a SMILES</h6>
+                        <p class="text-muted small">Paste from your spreadsheet or try one of our friendly examples.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="step-card text-center h-100">
+                        <div class="step-number mx-auto mb-3">2</div>
+                        <h6 class="fw-bold">Let AI discuss</h6>
+                        <p class="text-muted small">GAHT, RF, and MLP each give their vote plus a confidence badge.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="step-card text-center h-100">
+                        <div class="step-number mx-auto mb-3">3</div>
+                        <h6 class="fw-bold">Share the story</h6>
+                        <p class="text-muted small">Download predictions or show the heatmap in your next review.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Model Comparison -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-label">Under the hood</span>
+            <h2 class="page-heading">All three models, side by side</h2>
+            <p class="friendly-text mx-auto">Think of GAHT as the deep thinker, Random Forest as the practical friend, and MLP as the speedy checker. No scoreboards, just personalities you can trust.</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Model</th>
+                                <th>How it behaves</th>
+                                <th>Lean on it when…</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-primary">
+                                <td><strong>GAHT</strong></td>
+                                <td>Deep thinker that spots risky motifs fast</td>
+                                <td>You want the earliest possible warning, even if it errs on caution</td>
+                            </tr>
+                            <tr>
+                                <td>Random Forest</td>
+                                <td>Practical friend grounded in classic chemistry rules</td>
+                                <td>You need steady verdicts that match bench intuition</td>
+                            </tr>
+                            <tr>
+                                <td>MLP</td>
+                                <td>Fast checker that keeps everyone honest</td>
+                                <td>You are screening many molecules and need a quick second opinion</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('performance_page') }}" class="btn btn-primary">
+                        View Detailed Performance <i class="fas fa-chart-bar ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="container my-5 text-center">
+    <div class="card border-0 shadow-lg p-5">
+        <h2 class="fw-bold mb-3">Ready to get a friendly toxicity answer?</h2>
+        <p class="friendly-text mx-auto mb-4">
+            Hop into the predictor or upload a spreadsheet. We will keep the colorful visuals and simple wording coming.
+        </p>
+        <div class="d-grid gap-2 d-md-flex justify-content-center">
+            <a href="{{ url_for('predict_page') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-play me-2"></i>
+                Start Prediction
+            </a>
+            <a href="{{ url_for('batch_page') }}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-upload me-2"></i>
+                Batch Upload
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Usage Guidance -->
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <span class="section-label">Before you jump in</span>
+        <h2 class="page-heading">How people use HepatoTox every day</h2>
+        <p class="friendly-text mx-auto">Share these tips with teammates so nobody feels lost the first time they land here.</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="info-card h-100">
+                <h5 class="fw-bold">Clipboard ready</h5>
+                <p class="friendly-text">Keep your SMILES in a doc or spreadsheet. Paste it once and re-use the result in reports, tickets, or emails.</p>
+                <p class="text-muted small mb-0">Bonus: pre-fill using the dataset gallery if you are browsing.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-card h-100">
+                <h5 class="fw-bold">Explain it out loud</h5>
+                <p class="friendly-text">Use the color story from the Explainability tab while screen sharing. People remember the red and green atoms better than decimals.</p>
+                <p class="text-muted small mb-0">Great for design reviews or safety checkpoints.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-card h-100">
+                <h5 class="fw-bold">Batch on Fridays</h5>
+                <p class="friendly-text">Schedule a weekly CSV upload to keep your backlog moving. The returned file slides straight into Google Sheets.</p>
+                <p class="text-muted small mb-0">Need guidance? The Batch page walks through every step.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

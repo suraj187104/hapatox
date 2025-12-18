@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Batch Prediction - HepatoTox{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <span class="section-label">Spreadsheet lovers welcome</span>
+                <h2 class="page-heading">Upload once, get a friendly report for {{ 100 }} molecules.</h2>
+                <p class="friendly-text mx-auto">Drop in a CSV with a <strong>SMILES</strong> column. We will handle the heavy lifting and hand you back a colorful file you can share.</p>
+            </div>
+
+            <!-- Instructions -->
+            <div class="alert alert-info mb-4">
+                <h6 class="alert-heading">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Instructions
+                </h6>
+                <ul class="mb-0">
+                    <li>Prepare a CSV file with a column named <code>SMILES</code></li>
+                    <li>Each row should contain one SMILES string</li>
+                    <li>Maximum {{ 100 }} molecules per batch</li>
+                    <li>Results will be downloaded as a CSV file</li>
+                </ul>
+            </div>
+
+            <div class="card shadow-sm mb-4 info-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">What you get back</h5>
+                    <ul class="mb-0 small">
+                        <li>A CSV with the original SMILES plus consensus verdict, individual model notes, and friendly text.</li>
+                        <li>No data is stored after the download finishes—refresh the page and the history is gone.</li>
+                        <li>Share the returned file with anyone; it contains all the context they need to understand each prediction.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Upload Form -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Upload CSV File</h5>
+                    <form id="batchForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="fileInput" class="form-label">Select File:</label>
+                            <input type="file" class="form-control form-control-lg" id="fileInput" 
+                                   accept=".csv" required>
+                            <div class="form-text">CSV file with SMILES column (max 16MB)</div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="fas fa-cloud-upload-alt me-2"></i>
+                                Upload & Predict
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Example CSV -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="card-title mb-3">Example CSV Format:</h6>
+                    <pre class="bg-light p-3 rounded mb-0"><code>SMILES
+Cc1cc(ccc1N)c2ccc(N)c(C)c2
+O=[N+]([O-])c1ccc(O)cc1
+C(CCc1ccccn1)c2ccccc2</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary mt-2" id="downloadTemplate">
+                        <i class="fas fa-download me-1"></i>
+                        Download Template
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress -->
+            <div id="progressSection" style="display: none;">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Processing...</h5>
+                        <div class="progress mb-2" style="height: 30px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" 
+                                 id="progressBar" style="width: 0%">
+                                <span id="progressText">0%</span>
+                            </div>
+                        </div>
+                        <p class="text-center text-muted mb-0" id="progressMessage">
+                            Uploading file...
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Info -->
+            <div class="card border-success" style="display: none;" id="successCard">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <h5 class="text-success mb-3">Batch Prediction Complete!</h5>
+                    <p class="mb-3">Your results are ready for download.</p>
+                    <button class="btn btn-success" id="downloadResults">
+                        <i class="fas fa-download me-2"></i>
+                        Download Results CSV
+                    </button>
+                    <p class="text-muted small mt-3">Tip: rename the CSV with today’s date so it is easy to track in your audit trail.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    let resultsBlob = null;
+
+    $('#batchForm').submit(function(e) {
+        e.preventDefault();
+        
+        const fileInput = $('#fileInput')[0];
+        if (!fileInput.files.length) {
+            alert('Please select a file');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        // Show progress
+        $('#progressSection').show();
+        $('#successCard').hide();
+        $('#progressBar').css('width', '20%');
+        $('#progressText').text('20%');
+        $('#progressMessage').text('Uploading file...');
+
+        $.ajax({
+            url: '/api/batch',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            xhr: function() {
+                const xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 20;
+                        $('#progressBar').css('width', percentComplete + '%');
+                    }
+                }, false);
+                return xhr;
+            },
+            success: function(data, status, xhr) {
+                // Simulate processing progress
+                $('#progressBar').css('width', '100%');
+                $('#progressText').text('100%');
+                $('#progressMessage').text('Processing complete!');
+                
+                // Store blob for download
+                resultsBlob = new Blob([data], { type: 'text/csv' });
+                
+                setTimeout(function() {
+                    $('#progressSection').hide();
+                    $('#successCard').show();
+                }, 500);
+            },
+            error: function(xhr) {
+                const error = xhr.responseJSON?.error || 'Batch prediction failed';
+                alert('Error: ' + error);
+                $('#progressSection').hide();
+            }
+        });
+    });
+
+    // Download results
+    $('#downloadResults').click(function() {
+        if (resultsBlob) {
+            const url = window.URL.createObjectURL(resultsBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hepatotox_predictions.csv';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+    });
+
+    // Download template
+    $('#downloadTemplate').click(function() {
+        const template = 'SMILES\nCc1cc(ccc1N)c2ccc(N)c(C)c2\nO=[N+]([O-])c1ccc(O)cc1\nC(CCc1ccccn1)c2ccccc2';
+        const blob = new Blob([template], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'template.csv';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    });
+});
+</script>
+{% endblock %}

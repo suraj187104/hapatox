@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Predict Toxicity - HepatoTox{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-4">
+                <span class="section-label">Single molecule mode</span>
+                <h2 class="page-heading">Check a molecule in under a minute.</h2>
+                <p class="friendly-text mx-auto">Paste a SMILES string (or borrow one of ours), hit “Predict,” and we will tell you what each model thinks in plain English.</p>
+            </div>
+            
+            <!-- Input Section -->
+            <div class="card shadow-sm mb-4 info-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">1. Tell us about your molecule</h5>
+                    <div class="mb-3">
+                        <label for="smilesInput" class="form-label">SMILES String:</label>
+                        <input type="text" class="form-control form-control-lg" id="smilesInput" 
+                               placeholder="e.g., CC(C)Cc1ccc(cc1)C(C)C(O)=O" value="">
+                        <div class="form-text">Tip: copy from Excel or type it in — we check the format for you.</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button class="btn btn-primary btn-lg" id="predictBtn">
+                            <i class="fas fa-magic me-2"></i>
+                            Predict Toxicity
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example Molecules -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="card-title mb-3">Need inspiration? Try one of these:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-sm btn-outline-secondary example-btn" data-smiles="Cc1cc(ccc1N)c2ccc(N)c(C)c2">
+                            Example 1 (Toxic)
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary example-btn" data-smiles="O=[N+]([O-])c1ccc(O)cc1">
+                            Example 2 (Toxic)
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary example-btn" data-smiles="C(CCc1ccccn1)c2ccccc2">
+                            Example 3 (Non-toxic)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guidance -->
+            <div class="card shadow-sm mb-4 info-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">What happens after you click Predict?</h5>
+                    <ol class="mb-0 small">
+                        <li>The SMILES is cleaned so stray characters or salts do not break the models.</li>
+                        <li>GAHT, Random Forest, and MLP vote separately; none of them can override the others.</li>
+                        <li>We build a short “consensus story” you can copy into chat, docs, or emails.</li>
+                        <li>The explainability endpoint warms up so you can highlight atoms immediately if needed.</li>
+                        <li>No personal data is stored—only anonymous counters help us monitor uptime.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loadingSpinner" class="text-center my-4" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Analyzing molecule...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" style="display: none;">
+                <div class="text-center mb-4">
+                    <span class="section-label">Results</span>
+                    <p class="friendly-text mx-auto">Here’s what each model said, plus the group consensus. We keep the wording simple so you can copy-paste it anywhere.</p>
+                </div>
+                <!-- Molecule Structure -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body text-center">
+                        <h5 class="card-title mb-3">Molecular Structure</h5>
+                        <div id="moleculeImage"></div>
+                        <p class="text-muted small mt-2" id="moleculeSMILES"></p>
+                    </div>
+                </div>
+
+                <!-- Predictions -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">Model Predictions</h5>
+                        
+                        <!-- Consensus -->
+                        <div class="alert alert-info border-0 shadow-sm mb-4" id="consensusAlert">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-users fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1 fw-bold">Consensus Prediction</h6>
+                                    <p class="mb-0" id="consensusText"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Individual Models -->
+                        <div class="row g-3">
+                            <!-- GAHT -->
+                            <div class="col-md-4">
+                                <div class="card h-100 border-primary">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-primary">
+                                            <i class="fas fa-brain me-1"></i> GAHT
+                                        </h6>
+                                        <div id="gahtResult"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Random Forest -->
+                            <div class="col-md-4">
+                                <div class="card h-100 border-secondary">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-secondary">
+                                            <i class="fas fa-tree me-1"></i> Random Forest
+                                        </h6>
+                                        <div id="rfResult"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- MLP -->
+                            <div class="col-md-4">
+                                <div class="card h-100 border-secondary">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-secondary">
+                                            <i class="fas fa-project-diagram me-1"></i> MLP
+                                        </h6>
+                                        <div id="mlpResult"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="text-center">
+                    <a href="{{ url_for('explainability_page') }}" class="btn btn-success" id="explainBtn">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Explain Prediction
+                    </a>
+                    <button class="btn btn-outline-primary" id="newPredictionBtn">
+                        <i class="fas fa-redo me-2"></i>
+                        New Prediction
+                    </button>
+                    <p class="text-muted small mt-3">Tip: screenshot or download the consensus text before leaving the page so you can paste it into lab notes later.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    let currentSMILES = '';
+
+    // Predict button click
+    $('#predictBtn').click(function() {
+        const smiles = $('#smilesInput').val().trim();
+        if (!smiles) {
+            alert('Please enter a SMILES string');
+            return;
+        }
+        predictToxicity(smiles);
+    });
+
+    // Example button clicks
+    $('.example-btn').click(function() {
+        const smiles = $(this).data('smiles');
+        $('#smilesInput').val(smiles);
+        predictToxicity(smiles);
+    });
+
+    // New prediction button
+    $('#newPredictionBtn').click(function() {
+        $('#resultsSection').hide();
+        $('#smilesInput').val('').focus();
+    });
+
+    function predictToxicity(smiles) {
+        currentSMILES = smiles;
+        
+        // Show loading
+        $('#loadingSpinner').show();
+        $('#resultsSection').hide();
+
+        // Make API call
+        $.ajax({
+            url: '/api/predict',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ smiles: smiles }),
+            success: function(data) {
+                displayResults(data);
+            },
+            error: function(xhr) {
+                const error = xhr.responseJSON?.error || 'Prediction failed';
+                alert('Error: ' + error);
+                $('#loadingSpinner').hide();
+            }
+        });
+    }
+
+    function displayResults(data) {
+        $('#loadingSpinner').hide();
+        
+        // Display SMILES
+        $('#moleculeSMILES').text(data.smiles);
+
+        // Consensus prediction
+        if (data.consensus) {
+            const cons = data.consensus;
+            const alertClass = cons.prediction === 'Toxic' ? 'alert-danger' : 'alert-success';
+            $('#consensusAlert').removeClass('alert-info alert-danger alert-success').addClass(alertClass);
+            $('#consensusText').html(`
+                <strong>${cons.prediction}</strong> 
+                (Probability: ${(cons.probability * 100).toFixed(1)}%, 
+                Confidence: ${(cons.confidence * 100).toFixed(1)}%)
+            `);
+        }
+
+        // Individual models
+        displayModelResult('gaht', data.gaht);
+        displayModelResult('rf', data.rf);
+        displayModelResult('mlp', data.mlp);
+
+        $('#resultsSection').show();
+    }
+
+    function displayModelResult(modelId, result) {
+        const container = $(`#${modelId}Result`);
+        if (!result) {
+            container.html('<p class="text-muted small">Not available</p>');
+            return;
+        }
+
+        const badgeClass = result.prediction === 'Toxic' ? 'bg-danger' : 'bg-success';
+        container.html(`
+            <p class="mb-2">
+                <span class="badge ${badgeClass}">${result.prediction}</span>
+            </p>
+            <p class="small mb-1">Probability: <strong>${(result.probability * 100).toFixed(1)}%</strong></p>
+            <div class="progress" style="height: 8px;">
+                <div class="progress-bar ${result.prediction === 'Toxic' ? 'bg-danger' : 'bg-success'}" 
+                     style="width: ${result.probability * 100}%"></div>
+            </div>
+            <p class="small text-muted mt-1">Confidence: ${(result.confidence * 100).toFixed(1)}%</p>
+        `);
+    }
+});
+</script>
+{% endblock %}
