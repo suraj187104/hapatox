@@ -2,10 +2,17 @@
 Feature extraction for ML models
 """
 import numpy as np
-import torch
+try:
+    import torch
+    from torch_geometric.data import Data
+    HAS_TORCH = True
+except ImportError:
+    HAS_TORCH = False
+    torch = None
+    Data = None
+
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, Lipinski
-from torch_geometric.data import Data
 
 
 def extract_ecfp(mol, radius=2, n_bits=2048):
@@ -59,6 +66,9 @@ def mol_to_graph(mol):
     """
     Convert RDKit molecule to PyTorch Geometric Data object
     """
+    if not HAS_TORCH:
+        return None
+    
     try:
         # Generate 3D conformer
         mol_3d = generate_3d_conformer(mol)

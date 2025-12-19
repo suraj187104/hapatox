@@ -1,36 +1,14 @@
 """
-Model Loader - Demo mode for free deployment
+Model Loader - Load REAL trained models (local only, not for GitHub)
 """
 import pickle
 import numpy as np
 from pathlib import Path
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import StandardScaler
-
-
-class DemoRandomForest:
-    """Demo RF that gives random but plausible predictions"""
-    def predict_proba(self, X):
-        np.random.seed(hash(str(X[0])) % 2**32)
-        n_samples = len(X)
-        proba = np.random.beta(2, 5, size=(n_samples, 2))
-        proba = proba / proba.sum(axis=1, keepdims=True)
-        return proba
-
-
-class DemoMLP:
-    """Demo MLP that gives random but plausible predictions"""
-    def predict_proba(self, X):
-        np.random.seed(hash(str(X[0])) % 2**32 + 100)
-        n_samples = len(X)
-        proba = np.random.beta(3, 4, size=(n_samples, 2))
-        proba = proba / proba.sum(axis=1, keepdims=True)
-        return proba
+from config import RF_MODEL_PATH, MLP_MODEL_PATH
 
 
 class ModelLoader:
-    """Load and manage models - Demo mode for free tier"""
+    """Load and manage real trained models"""
     
     def __init__(self):
         self.gaht_model = None
@@ -41,22 +19,32 @@ class ModelLoader:
         self.load_models()
     
     def load_models(self):
-        """Load demo models (no files needed)"""
-        print("⚠️  Running in DEMO MODE (free tier)")
-        print("⚠️  Predictions are simulated - deploy with real models for production")
-        
-        # GAHT disabled for free tier
+        """Load real trained models from disk"""
+        # GAHT disabled (requires torch)
         self.gaht_model = None
-        print("❌ GAHT disabled (requires torch - too heavy for free tier)")
+        print(">> GAHT disabled (requires torch)")
         
-        # Create demo Random Forest
-        self.rf_model = DemoRandomForest()
-        print("✅ Random Forest model loaded (demo mode)")
+        # Load REAL Random Forest
+        try:
+            with open(RF_MODEL_PATH, 'rb') as f:
+                self.rf_model = pickle.load(f)
+            print(">> Random Forest model loaded (REAL)")
+        except Exception as e:
+            print(f">> Failed to load RF: {e}")
         
-        # Create demo MLP
-        self.mlp_model = DemoMLP()
-        self.mlp_scaler = StandardScaler()  # Dummy scaler
-        print("✅ MLP model loaded (demo mode)")
+        # Load REAL MLP
+        try:
+            with open(MLP_MODEL_PATH, 'rb') as f:
+                mlp_obj = pickle.load(f)
+            if isinstance(mlp_obj, tuple) and len(mlp_obj) >= 2:
+                self.mlp_model = mlp_obj[0]
+                self.mlp_scaler = mlp_obj[1]
+            else:
+                self.mlp_model = mlp_obj
+                self.mlp_scaler = None
+            print(">> MLP model loaded (REAL)")
+        except Exception as e:
+            print(f">> Failed to load MLP: {e}")
     
     def get_gaht(self):
         return self.gaht_model

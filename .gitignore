@@ -56,6 +56,10 @@ data/*.json
 models/*.pth
 models/*.pkl
 models/*.h5
+models_local/*.pkl
+models_local/*.pth
+trained_models/*.pkl
+trained_models/*.pth
 !models/.gitkeep
 
 # Screenshots with timestamps (keep cleaned versions)

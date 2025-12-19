@@ -16,18 +16,18 @@ app.config['SECRET_KEY'] = SECRET_KEY
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Load models once on startup
-print("🚀 Loading models...")
+print(">> Loading models...")
 model_loader = ModelLoader()
 predictor = ToxicityPredictor(model_loader)
-print("✅ Models loaded successfully!")
+print(">> Models loaded successfully!")
 
 # Load dataset for explorer
-print("📊 Loading dataset...")
+print(">> Loading dataset...")
 try:
     dataset = pd.read_csv(DATASET_PATH)
-    print(f"✅ Loaded {len(dataset):,} molecules")
+    print(f">> Loaded {len(dataset):,} molecules")
 except Exception as e:
-    print(f"⚠️  Warning: Could not load dataset: {e}")
+    print(f">> Warning: Could not load dataset: {e}")
     dataset = None
 
 # Load metrics
@@ -220,9 +220,9 @@ def api_batch():
 
 if __name__ == '__main__':
     print(f"\n{'='*60}")
-    print(f"🧪 {APP_NAME} v{APP_VERSION}")
+    print(f">> {APP_NAME} v{APP_VERSION}")
     print(f"{'='*60}")
-    print(f"🌐 Starting server at http://{HOST}:{PORT}")
+    print(f">> Starting server at http://{HOST}:{PORT}")
     print(f"{'='*60}\n")
     
     app.run(host=HOST, port=PORT, debug=DEBUG)

@@ -1,9 +1,16 @@
 """
 Toxicity Predictor - Unified prediction interface
 """
-import torch
+try:
+    import torch
+    from torch_geometric.data import Data
+    HAS_TORCH = True
+except ImportError:
+    HAS_TORCH = False
+    torch = None
+    Data = None
+
 import numpy as np
-from torch_geometric.data import Data
 from rdkit import Chem
 
 from utils.molecule_utils import smiles_to_mol
@@ -15,7 +22,7 @@ class ToxicityPredictor:
     
     def __init__(self, model_loader):
         self.model_loader = model_loader
-        self.device = torch.device('cpu')
+        self.device = torch.device('cpu') if HAS_TORCH else None
     
     def predict(self, smiles):
         """
@@ -39,7 +46,7 @@ class ToxicityPredictor:
         # GAHT prediction
         try:
             gaht_model = self.model_loader.get_gaht()
-            if gaht_model is not None:
+            if gaht_model is not None and HAS_TORCH:
                 graph_data = mol_to_graph(mol)
                 if graph_data is not None:
                     graph_data = graph_data.to(self.device)
@@ -115,6 +122,9 @@ class ToxicityPredictor:
         Returns:
             dict with attention weights and important atoms
         """
+        if not HAS_TORCH:
+            raise ValueError("Explainability requires torch (not available in demo mode)")
+        
         mol = smiles_to_mol(smiles)
         if mol is None:
             raise ValueError("Invalid SMILES string")
