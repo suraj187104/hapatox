@@ -1,21 +1,36 @@
 """
 Configuration for Hepatotoxicity Prediction Web Application
 """
+import os
 from pathlib import Path
 
 # Base paths
 BASE_DIR = Path(__file__).parent
 PROJECT_ROOT = BASE_DIR.parent
 
-# Model paths (local models for teacher demo)
-MODELS_DIR = BASE_DIR / "models_local"
-GAHT_MODEL_PATH = None  # Disabled (requires torch)
-RF_MODEL_PATH = MODELS_DIR / "rf_fold_0.pkl"
-MLP_MODEL_PATH = MODELS_DIR / "mlp_fold_0.pkl"
+# Detect if running on Render (deployment) or locally
+IS_PRODUCTION = os.environ.get('RENDER') is not None or not (BASE_DIR / "models_local").exists()
 
-# Data paths (full dataset)
+# Model paths - use demo mode on Render, real models locally
+if IS_PRODUCTION:
+    # DEMO MODE for Render deployment (no model files)
+    MODELS_DIR = BASE_DIR / "models"
+    GAHT_MODEL_PATH = None  # GAHT disabled in demo mode
+    RF_MODEL_PATH = None    # Use demo RF
+    MLP_MODEL_PATH = None   # Use demo MLP
+else:
+    # FULL MODE for local PC (real models with GAHT)
+    MODELS_DIR = BASE_DIR / "models_local"
+    GAHT_MODEL_PATH = MODELS_DIR / "gaht_fold_0.pth"
+    RF_MODEL_PATH = MODELS_DIR / "rf_fold_0.pkl"
+    MLP_MODEL_PATH = MODELS_DIR / "mlp_fold_0.pkl"
+
+# Data paths - demo data on Render, full data locally
 DATA_DIR = BASE_DIR / "data"
-DATASET_PATH = DATA_DIR / "combined_tox21_hepatotoxicity.csv"
+if IS_PRODUCTION:
+    DATASET_PATH = DATA_DIR / "demo_molecules.csv"
+else:
+    DATASET_PATH = DATA_DIR / "combined_tox21_hepatotoxicity.csv"
 
 # Results paths
 RESULTS_DIR = PROJECT_ROOT / "submission_workspace" / "results"
