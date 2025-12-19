@@ -78,6 +78,16 @@ def api_predict():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/model_status')
+def api_model_status():
+    """Check which models are available"""
+    return jsonify({
+        'gaht_available': model_loader.get_gaht() is not None,
+        'rf_available': model_loader.get_rf() is not None,
+        'mlp_available': model_loader.get_mlp() is not None
+    })
+
+
 @app.route('/explainability')
 def explainability_page():
     """XAI visualization page"""
@@ -95,6 +105,13 @@ def api_explain():
         is_valid, error = validate_smiles(smiles)
         if not is_valid:
             return jsonify({'error': error}), 400
+        
+        # Check if GAHT is available
+        if model_loader.get_gaht() is None:
+            return jsonify({
+                'error': 'Explainability feature requires GAHT model',
+                'message': 'This feature is not available in demo mode. GAHT model requires PyTorch and is too large for free tier hosting.'
+            }), 503
         
         # Get explanation
         explanation = predictor.explain(smiles)

@@ -6,6 +6,13 @@
 <div class="container my-5">
     <div class="row">
         <div class="col-lg-10 mx-auto">
+            <!-- Demo Mode Notice -->
+            <div class="alert alert-info alert-dismissible fade show mb-4" role="alert" id="demoNotice" style="display: none;">
+                <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Demo Mode Active</h5>
+                <p class="mb-0">This explainability feature requires the GAHT model with PyTorch, which is not available in the free hosted demo. To use this feature, run the application locally with the full model files.</p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
             <div class="text-center mb-5">
                 <span class="section-label">Explain it simply</span>
                 <h2 class="page-heading">See which atoms made GAHT raise an eyebrow.</h2>
@@ -160,6 +167,15 @@
 <script>
 $(document).ready(function() {
     let currentSMILES = '';
+    
+    // Check if GAHT is available on page load
+    $.get('/api/model_status', function(status) {
+        if (!status.gaht_available) {
+            $('#demoNotice').show();
+        }
+    }).fail(function() {
+        // If endpoint doesn't exist, assume we're checking on first explain attempt
+    });
 
     // Explain button click
     $('#explainBtn').click(function() {
@@ -201,8 +217,19 @@ $(document).ready(function() {
                 displayExplanation(data);
             },
             error: function(xhr) {
-                const error = xhr.responseJSON?.error || 'Explanation failed';
-                alert('Error: ' + error);
+                const errorData = xhr.responseJSON;
+                const errorMsg = errorData?.message || errorData?.error || 'Explanation failed';
+                
+                // Show friendly error in a bootstrap alert
+                const alertHtml = `
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Feature Unavailable</h5>
+                        <p class="mb-0">${errorMsg}</p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                
+                $('#resultsSection').html(alertHtml).show();
                 $('#loadingSpinner').hide();
             }
         });
