@@ -251,7 +251,7 @@ If you use HepatoTox in research or production, please cite:
 ## 📧 Contact & Support
 
 - **Issues**: [GitHub Issues](https://github.com/yourusername/hepatotox-predictor/issues)
-- **Email**: your.email@example.com
+- **Email**: iamsuraj87104@gmail.com
 - **Documentation**: [Full Docs](docs/)
 
 ---
