@@ -36,7 +36,7 @@ Built on peer-reviewed research featuring **GAHT** (Geo-Aware Hybrid Transformer
 ## 🖼️ Screenshots
 
 ### Home Page – Friendly Hero & Stats
-![Home Page](screenshots/home.png)
+![Home Page](screenshots/hero.png)
 *Plain-language metrics and a warm welcome replacing intimidating accuracy tables.*
 
 ### Single Prediction – Instant Feedback
